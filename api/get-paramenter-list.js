@@ -1,6 +1,14 @@
+const getAllParams = require("../models/get-params");
+
 function getAllParameters(req , res) {
-  var parameters = [];
-  return res.send(parameters);
+   
+    getAllParams().then((params) => {
+        res.send(params);
+    }
+    ).catch((err) => {
+        res.send(err);
+    });
+
 }
 
 module.exports = getAllParameters;

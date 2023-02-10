@@ -3,6 +3,9 @@
 const express = require('express');
 const handleInputData = require('./api/add-data.js');
 const ConfigureSystem = require('./api/configure.js');
+const handleInputParams = require('./api/add-parameter.js');
+const getAllParameters = require('./api/get-paramenter-list.js');
+const clusterBySingleParam = require('./api/cluster-by-single-param.js');
 
 // Constants
 const PORT = 8080;
@@ -37,6 +40,19 @@ app.post('/configure', (req, res) => {
 app.get('/parameters', (req, res) => {
     getAllParameters(req, res);
 });
+
+//add parameter
+app.post('/parameters', (req, res) => {
+   handleInputParams(req, res);
+});
+
+//cluster by single parameter
+app.post('/cluster', (req, res) => {
+    clusterBySingleParam(req, res);
+});
+
+//fake cluster
+
 
 
 
