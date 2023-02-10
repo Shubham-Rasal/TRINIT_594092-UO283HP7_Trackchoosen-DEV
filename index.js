@@ -2,6 +2,7 @@
 
 const express = require('express');
 const handleInputData = require('./api/add-data.js');
+const ConfigureSystem = require('./api/configure.js');
 
 // Constants
 const PORT = 8080;
@@ -26,6 +27,16 @@ app.post('/data', (req, res) => {
     handleInputData(req, res);    
 });
 
+
+//configure system
+app.post('/configure', (req, res) => {
+    ConfigureSystem(req, res);
+});
+
+//get parameter list
+app.get('/parameters', (req, res) => {
+    getAllParameters(req, res);
+});
 
 
 
