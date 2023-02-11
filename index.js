@@ -1,11 +1,14 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors')
 const handleInputData = require('./api/add-data.js');
 const ConfigureSystem = require('./api/configure.js');
 const handleInputParams = require('./api/add-parameter.js');
 const getAllParameters = require('./api/get-paramenter-list.js');
 const clusterBySingleParam = require('./api/cluster-by-single-param.js');
+const getAllEntities = require('./models/get-entities.js');
+const getAllData = require('./api/get-all-entities.js');
 
 // Constants
 const PORT = 8080;
@@ -17,7 +20,7 @@ const app = express();
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors());
 
 
 app.get('/', (req, res) => {
@@ -25,9 +28,14 @@ app.get('/', (req, res) => {
 });
 
 
-//get data
+//post data
 app.post('/data', (req, res) => {
     handleInputData(req, res);    
+});
+
+//get data
+app.get('/data', (req, res) => {
+    getAllData(req, res);
 });
 
 
