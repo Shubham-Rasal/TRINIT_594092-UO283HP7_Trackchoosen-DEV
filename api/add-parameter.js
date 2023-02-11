@@ -5,7 +5,7 @@ async function handleInputParams(req, res) {
   console.log(data);
   await addParams(data);
 
-  res.send("params added");
+  res.json({ message: "success" });
 }
 
 module.exports = handleInputParams;
