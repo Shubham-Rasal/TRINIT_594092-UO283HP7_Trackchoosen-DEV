@@ -2,10 +2,11 @@ const addEntity = require("../models/add-entity");
 
 async function handleInputData(req, res) {
   const data = req.body;
-  console.log(data);
-  await addEntity(data);
+  console.log(data);  
 
-  res.send("entity added");
+  const entity = await addEntity(data);
+
+  res.json({ "entity" : entity });
 }
 
 module.exports = handleInputData;
