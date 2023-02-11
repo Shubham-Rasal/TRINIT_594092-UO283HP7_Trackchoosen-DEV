@@ -6,13 +6,11 @@ const getAllParams = require("../models/get-params");
 function clusterBySingleParam(req, res) {
   const { name, type, radius, no_of_neighbours } = req.body;
 
-
   switch (type) {
     case "number":
       clusterByNumber(name, radius, no_of_neighbours)
         .then((clusters) => {
-          res.status(200).json(clusters);   
-        
+          res.status(200).json(clusters);
         })
         .catch((err) => {
           console.log(err);
@@ -20,21 +18,27 @@ function clusterBySingleParam(req, res) {
       break;
     case "string":
       clusterByString(name, radius, no_of_neighbours)
-        .then((clusters) => {})
+        .then((clusters) => {
+          res.status(200).json(clusters);
+        })
         .catch((err) => {
           console.log(err);
         });
       break;
     case "boolean":
       clusterByBoolean(name, radius, no_of_neighbours)
-        .then((clusters) => {})
+        .then((clusters) => {
+          res.status(200).json(clusters);
+        })
         .catch((err) => {
           console.log(err);
         });
       break;
     case "date":
       clusterByDate(name, radius, no_of_neighbours)
-        .then((clusters) => {})
+        .then((clusters) => {
+          res.status(200).json(clusters);
+        })
         .catch((err) => {
           console.log(err);
         });
@@ -43,8 +47,6 @@ function clusterBySingleParam(req, res) {
       console.log("Invalid type");
       res.status(400).json({ message: "Invalid type" });
   }
-
-  
 }
 
 async function clusterByNumber(name, radius, no_of_neighbours) {
@@ -111,19 +113,17 @@ async function clusterByNumber(name, radius, no_of_neighbours) {
   //get the entities in each cluster
   const clustersWithEntities = [];
   clustersMap.forEach((cluster, key) => {
+    const ids = cluster[0];
+    console.log("ids", ids);
 
-      const ids = cluster[0];
-      console.log("ids", ids); 
+    const detailedEntities = ids.map((id) => {
+      const entity = entities.find((entity) => entity.id === id);
+      return entity;
+    });
 
-      const detailedEntities = ids.map((id) => {
-        const entity = entities.find((entity) => entity.id === id);
-        return entity;
-      });
+    console.log("detailedEntities", detailedEntities);
 
-      console.log("detailedEntities", detailedEntities);
-
-      clustersWithEntities.push(detailedEntities);
-    
+    clustersWithEntities.push(detailedEntities);
   });
 
   return clustersWithEntities;
@@ -325,6 +325,91 @@ async function clusterByBoolean(name) {
   });
 
   console.log("clustersWithEntities", clustersWithEntities);
+
+  return clustersWithEntities;
+}
+
+async function clusterByDate(name, radius, no_of_neighbours) {
+  // get all entities
+  const entities = await getAllEntities();
+  // get all params
+  const params = await getAllParams();
+  // get the required param
+  const param = params.find((param) => param.name === name);
+
+  // filter entities to get only the required parameter
+  const filteredEntities = entities.map(({ entity, id }) => {
+    // check if the entity has the required parameter
+    if (!entity.parameters) {
+      return null;
+    }
+
+    const param = entity.parameters.find((param) => param.name === name);
+
+    if (!param) {
+      return null;
+    }
+
+    // return the entity with the value of the required parameter
+    return {
+      id: id,
+      value: param.value,
+    };
+  });
+
+  // filter out the null values
+  const filteredEntities2 = filteredEntities.filter(
+    (entity) => entity !== null
+  );
+
+  //convert date to unix timestamp
+  filteredEntities2.forEach((entity) => {
+    entity.value = new Date(entity.value).getTime();
+  });
+
+  //create dataset
+  const dataset = filteredEntities2.map((entity) => {
+    return [entity.value, 0];
+  });
+
+  console.log("dataset", dataset);
+
+  //convert no of years to milliseconds
+  const radiusInMilliseconds = radius * 365 * 24 * 60 * 60 * 1000;
+
+  const clusters = dbscan.run(dataset, radiusInMilliseconds, no_of_neighbours);
+
+  console.log("clusters", clusters);
+
+  // create a map of clusters
+  const clustersMap = new Map();
+  clusters.forEach((cluster, index) => {
+    clustersMap.set(cluster, []);
+  });
+
+  // add entities to clustermap
+  clusters.forEach((cluster, index) => {
+    const ids = cluster.map((index) => filteredEntities2[index].id);
+    clustersMap.get(cluster).push(ids);
+  });
+
+  console.log("clustersMap", clustersMap);
+
+  //get the entities in each cluster
+  const clustersWithEntities = [];
+  clustersMap.forEach((cluster, key) => {
+    const ids = cluster[0];
+    console.log("ids", ids);
+
+    const detailedEntities = ids.map((id) => {
+      const entity = entities.find((entity) => entity.id === id);
+      return entity;
+    });
+
+    console.log("detailedEntities", detailedEntities);
+
+    clustersWithEntities.push(detailedEntities);
+  });
 
   return clustersWithEntities;
 }
