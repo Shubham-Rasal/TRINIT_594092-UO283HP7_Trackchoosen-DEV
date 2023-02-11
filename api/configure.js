@@ -6,6 +6,8 @@ const ConfigureSystem  = (req, res) => {
 
     console.log(parameters);
 
+    
+
     res.send("Data received");
 }
 

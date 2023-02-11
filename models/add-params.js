@@ -10,6 +10,7 @@ async function addParams(params) {
      const paramsList = [];
      paramsList.push(params);
      set(paramsRef, paramsList);
+     console.log("paramsList", paramsList);
      return;
   }
 

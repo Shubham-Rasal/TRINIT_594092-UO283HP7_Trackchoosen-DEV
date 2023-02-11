@@ -5,7 +5,11 @@ async function addEntity(entity) {
   //add entity to database
   const entity_id = uuidv4();
   set(ref(db, "entities/" + entity_id), entity);
-
+  
+  return {
+    id: entity_id,
+    entity: entity,
+  }
 
 
 }

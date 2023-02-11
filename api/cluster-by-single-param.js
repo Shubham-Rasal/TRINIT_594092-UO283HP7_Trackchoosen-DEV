@@ -4,11 +4,12 @@ const getAllEntities = require("../models/get-entities");
 const getAllParams = require("../models/get-params");
 
 function clusterBySingleParam(req, res) {
-  const { name, type, radius, no_of_neighbours } = req.body;
+  const { name, type, radius, neighbours } = req.body;
+  
 
   switch (type) {
     case "number":
-      clusterByNumber(name, radius, no_of_neighbours)
+      clusterByNumber(name, radius, neighbours)
         .then((clusters) => {
           res.status(200).json(clusters);
         })
@@ -17,7 +18,7 @@ function clusterBySingleParam(req, res) {
         });
       break;
     case "string":
-      clusterByString(name, radius, no_of_neighbours)
+      clusterByString(name, radius, neighbours)
         .then((clusters) => {
           res.status(200).json(clusters);
         })
@@ -26,7 +27,7 @@ function clusterBySingleParam(req, res) {
         });
       break;
     case "boolean":
-      clusterByBoolean(name, radius, no_of_neighbours)
+      clusterByBoolean(name, radius, neighbours)
         .then((clusters) => {
           res.status(200).json(clusters);
         })
@@ -35,7 +36,7 @@ function clusterBySingleParam(req, res) {
         });
       break;
     case "date":
-      clusterByDate(name, radius, no_of_neighbours)
+      clusterByDate(name, radius, neighbours)
         .then((clusters) => {
           res.status(200).json(clusters);
         })
@@ -49,7 +50,7 @@ function clusterBySingleParam(req, res) {
   }
 }
 
-async function clusterByNumber(name, radius, no_of_neighbours) {
+async function clusterByNumber(name, radius, neighbours) {
   const entities = await getAllEntities();
   const params = await getAllParams();
   //   console.log(params);
@@ -92,7 +93,7 @@ async function clusterByNumber(name, radius, no_of_neighbours) {
   console.log("dataset", dataset);
 
   // cluster the dataset
-  const clusters = dbscan.run(dataset, radius, no_of_neighbours);
+  const clusters = dbscan.run(dataset, radius, neighbours);
 
   console.log("clusters", clusters);
 
@@ -329,7 +330,7 @@ async function clusterByBoolean(name) {
   return clustersWithEntities;
 }
 
-async function clusterByDate(name, radius, no_of_neighbours) {
+async function clusterByDate(name, radius, neighbours) {
   // get all entities
   const entities = await getAllEntities();
   // get all params
@@ -377,7 +378,7 @@ async function clusterByDate(name, radius, no_of_neighbours) {
   //convert no of years to milliseconds
   const radiusInMilliseconds = radius * 365 * 24 * 60 * 60 * 1000;
 
-  const clusters = dbscan.run(dataset, radiusInMilliseconds, no_of_neighbours);
+  const clusters = dbscan.run(dataset, radiusInMilliseconds, neighbours);
 
   console.log("clusters", clusters);
 
