@@ -5,8 +5,11 @@ export default function Parameters() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const url = "https://thankful-ant-helmet.cyclic.app"
+
   useEffect(() => {
-    fetch("http://localhost:8080/parameters")
+    // fetch("http://localhost:8080/parameters")
+    fetch(url + "/parameters")
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -60,7 +63,8 @@ export default function Parameters() {
     e.target.reset();
 
     //update the database
-    const res = await fetch("http://localhost:8080/parameters", {
+    // const res = await fetch("http://localhost:8080/parameters", {
+    const res = await fetch(url + "/parameters", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

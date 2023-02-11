@@ -16,11 +16,13 @@ export default function Clusters() {
   const [neighbours, setNeighbours] = useState(2);
   const [clusters, setClusters] = useState([]);
   const [chartData, setChartData] = useState({});
+  const url = "https://thankful-ant-helmet.cyclic.app"
 
   const [query, setQuery] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:8080/parameters")
+    // fetch("http://localhost:8080/parameters")
+    fetch(url + "/parameters")
       .then((res) => res.json())
       .then((data) => {
         setParameters(data.params);
@@ -45,7 +47,8 @@ export default function Clusters() {
 
     console.log("query changed", query);
 
-    fetch("http://localhost:8080/cluster", {
+    // fetch("http://localhost:8080/cluster", {
+    fetch(url + "/cluster", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

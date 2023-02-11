@@ -6,6 +6,8 @@ export default function Entities() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const url = "https://thankful-ant-helmet.cyclic.app"
+
   const [newEntity, setNewEntity] = useState({
     name: "",
     parameters: [],
@@ -14,7 +16,8 @@ export default function Entities() {
   const [newEntityParameters, setNewEntityParameters] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/data")
+    // fetch("http://localhost:8080/data")
+    fetch(url + "/data")
       .then((res) => res.json())
       .then((data) => {
         setEntities(data);
@@ -26,7 +29,8 @@ export default function Entities() {
         setLoading(false);
       });
 
-    fetch("http://localhost:8080/parameters")
+    // fetch("http://localhost:8080/parameters")
+    fetch(url + "/parameters")
       .then((res) => res.json())
       .then((data) => {
         setParameters(data.params);
@@ -53,7 +57,8 @@ export default function Entities() {
     }
 
     //add the new entity to the database
-    const response = await fetch("http://localhost:8080/data", {
+    // const response = await fetch("http://localhost:8080/data", {
+    const response = await fetch(url + "/data", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
