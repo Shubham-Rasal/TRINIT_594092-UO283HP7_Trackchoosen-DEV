@@ -6,11 +6,13 @@ const getAllParams = require("../models/get-params");
 function clusterBySingleParam(req, res) {
   const { name, type, radius, no_of_neighbours } = req.body;
 
+
   switch (type) {
     case "number":
       clusterByNumber(name, radius, no_of_neighbours)
         .then((clusters) => {
-          console.log(clusters);
+          res.status(200).json(clusters);   
+        
         })
         .catch((err) => {
           console.log(err);
@@ -39,9 +41,10 @@ function clusterBySingleParam(req, res) {
       break;
     default:
       console.log("Invalid type");
+      res.status(400).json({ message: "Invalid type" });
   }
 
-  res.send("Data received");
+  
 }
 
 async function clusterByNumber(name, radius, no_of_neighbours) {
@@ -105,10 +108,28 @@ async function clusterByNumber(name, radius, no_of_neighbours) {
 
   console.log("clustersMap", clustersMap);
 
-  return clustersMap;
+  //get the entities in each cluster
+  const clustersWithEntities = [];
+  clustersMap.forEach((cluster, key) => {
+
+      const ids = cluster[0];
+      console.log("ids", ids); 
+
+      const detailedEntities = ids.map((id) => {
+        const entity = entities.find((entity) => entity.id === id);
+        return entity;
+      });
+
+      console.log("detailedEntities", detailedEntities);
+
+      clustersWithEntities.push(detailedEntities);
+    
+  });
+
+  return clustersWithEntities;
 }
 
-async function clusterByString(name, radius, no_of_neighbours) {
+async function clusterByString(name, radius) {
   // get all entities
   const entities = await getAllEntities();
   // get all params
@@ -179,7 +200,6 @@ async function clusterByString(name, radius, no_of_neighbours) {
     const cluster = [];
     for (let j = 0; j < distance[i].length; j++) {
       if (distance[i][j] <= radius) {
-
         //if already in some cluster, then add to that cluster
         // else create a new cluster
 
@@ -199,20 +219,16 @@ async function clusterByString(name, radius, no_of_neighbours) {
           if (!found) {
             cluster.push(filteredEntities2[i].id);
             cluster.push(filteredEntities2[j + i].id);
-          }                
-
-        }
-        else {
+          }
+        } else {
           cluster.push(filteredEntities2[i].id);
           cluster.push(filteredEntities2[j + i].id);
         }
-        
       }
     }
     if (cluster.length > 0) {
       clusters.push(cluster);
     }
-
   }
 
   //remove duplicates
@@ -222,10 +238,21 @@ async function clusterByString(name, radius, no_of_neighbours) {
 
   console.log("clusters", clusters);
 
+  //get the entities in each cluster
+  const clustersWithEntities = [];
+  clusters.forEach((cluster) => {
+    const detailedEntities = cluster.map((id) => {
+      return entities.find((entity) => entity.id === id);
+    });
+    clustersWithEntities.push(detailedEntities);
+  });
 
+  console.log("clustersWithEntities", clustersWithEntities);
+
+  return clustersWithEntities;
 }
 
-async function clusterByBoolean(name, radius, no_of_neighbours) {
+async function clusterByBoolean(name) {
   // get all entities
   const entities = await getAllEntities();
   // get all params
@@ -288,7 +315,18 @@ async function clusterByBoolean(name, radius, no_of_neighbours) {
 
   console.log("clustersMap", clustersMap);
 
-  return clustersMap;
+  //get the entities in each cluster
+  const clustersWithEntities = [];
+  clustersMap.forEach((value, key) => {
+    const detailedEntities = value.map((id) => {
+      return entities.find((entity) => entity.id === id);
+    });
+    clustersWithEntities.push(detailedEntities);
+  });
+
+  console.log("clustersWithEntities", clustersWithEntities);
+
+  return clustersWithEntities;
 }
 
 function levenshteinDistance(a, b) {
